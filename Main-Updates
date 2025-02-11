@@ -14,7 +14,7 @@
 void delay(int seconds) {
     std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
-
+// \/\/\/ Console clearing function. Not for use yet.....
 void clearConsole() {
 #ifdef _WIN32
     // For Windows
@@ -74,6 +74,38 @@ class tools{
         return temp;
     }
 };
+
+class mainMenu{
+    public:
+    void printMenu(){
+        std::cout << " \n Welcome \n Press 1 For New Game \n Press 2 For Saved Game \n Press 3 For Settings \n Press 4 For Developer Tools \n";
+    }
+};
+
+class newGameStart{
+    public:
+    void printStartOptions(){
+        // make sure to clear the screen before this next line.
+        //break
+        
+        std::string newGameMenuInput;
+           
+        std::cout << " \n---------->>> STARTING <<<----------- \n Press 1 Through 5 To Choose Your Starting Ship \n 1: The Hyperbole - Fast, Nimble, Light Armor, Machine Guns. \n";
+        std::cout << " 2: The Riser-2 - Strong Shields, Laser Cannons, Slow, Hard To Turn \n 3: The Sunrise - Medium Shields, Overpowered Engines, Small Cannons, Normally Slow \n";
+        std::cout << " 4: Newark - Quick, Small, Fast Engines, Light Guns \n 5: Winona - Laser Cannons, Fast Engines, No Shields, Quick \n";
+        std::cout << "Please Select A Ship And Press Enter.\n";
+        
+        if (newGameMenuInput == "1") {
+            
+        }
+        
+    }
+};
+
+
+
+
+
 class intro{
     public:
     void printIntro(){
@@ -152,9 +184,11 @@ intro g_intro;
 int main() {
     // The following is the how to play. 
     g_intro.printMainIntro();
-
+    
+    std::string newGameMenuInput;
     std::string skipIntro;
     std::cin >> skipIntro;
+    std::string mainMenuPrint;
 
     if (skipIntro == "Y" || skipIntro == "y") {
         g_intro.printIntro();
@@ -163,6 +197,22 @@ int main() {
     }
 
     std::cout << "Welcome aboard the STELLER-SHIP! Your space adventure begins now!\n";
+    
+     mainMenu menu;
 
+    // Print the main menu
+    menu.printMenu();
+    std::cin >> mainMenuPrint;
+    
+    if (mainMenuPrint == "1"){
+        // not finished. see the class mainMenu.
+        
+    }
+    
+    
     return 0;
+    
+    
+    
+    
 }
