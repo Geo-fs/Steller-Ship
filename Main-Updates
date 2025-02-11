@@ -3,12 +3,63 @@
 #include <chrono>
 #include <thread>
 #include <cctype>
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <cstdlib>
+#endif
+
+//break
 
 void delay(int seconds) {
     std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
+
+void clearConsole() {
+#ifdef _WIN32
+    // For Windows
+    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    DWORD count;
+    DWORD cellCount;
+    COORD homeCoords = { 0, 0 };
+
+    if (hStdOut == INVALID_HANDLE_VALUE) return;
+
+    if (!GetConsoleScreenBufferInfo(hStdOut, &csbi)) return;
+    cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+
+    if (!FillConsoleOutputCharacter(
+        hStdOut,
+        (TCHAR)' ',
+        cellCount,
+        homeCoords,
+        &count
+    )) return;
+
+    if (!FillConsoleOutputAttribute(
+        hStdOut,
+        csbi.wAttributes,
+        cellCount,
+        homeCoords,
+        &count
+    )) return;
+
+    SetConsoleCursorPosition(hStdOut, homeCoords);
+#else
+    // For Unix-like systems (Linux, macOS)
+    std::system("clear");
+#endif
+}
+// Use clearConsole(); when calling this.
+// break
+
 class tools{
     public:
+    
+    
+    
+    
     const char toUpperCase(const char& c){
         return std::toupper(c);
     }
@@ -52,6 +103,8 @@ class intro{
         delay(1);
         
         //Break
+        clearConsole();
+        
         std::cout << "Make Sure To Resize Your Game Console Window To The Center Of The Screen\n \n";
         delay(1);
         std::cout << "I Can't Stay Long.... Good Luck Cadet. \n We All Depend On You. \n Liftoff In: \n";
@@ -62,6 +115,9 @@ class intro{
         delay(1);
         std::cout << "1...\n";
         delay(1);
+        //break
+        clearConsole();
+        //break
         std::cout << "*Welcome To Space! I'm Outo The Computer. Lets Go!!! \n";
         delay(3);
         // Intro code ends here
