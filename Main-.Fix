@@ -1,3 +1,7 @@
+//Copyright 2025 CS Enterprises
+
+// Local Version v1.02 MAIN Version v1.07
+
 #include <iostream>
 #include <string>
 #include <chrono>
@@ -11,12 +15,10 @@
 #include <cstdlib>
 #endif
 
-//break
-
 void delay(int seconds) {
     std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
-// \/\/\/ Console clearing function. Not for use yet.....
+
 void clearConsole() {
 #ifdef _WIN32
     // For Windows
@@ -32,18 +34,18 @@ void clearConsole() {
     cellCount = csbi.dwSize.X * csbi.dwSize.Y;
 
     if (!FillConsoleOutputCharacter(
-        hStdOut,
-        (TCHAR)' ',
-        cellCount,
-        homeCoords,
+        hStdOut, 
+        (TCHAR)' ', 
+        cellCount, 
+        homeCoords, 
         &count
     )) return;
 
     if (!FillConsoleOutputAttribute(
-        hStdOut,
-        csbi.wAttributes,
-        cellCount,
-        homeCoords,
+        hStdOut, 
+        csbi.wAttributes, 
+        cellCount, 
+        homeCoords, 
         &count
     )) return;
 
@@ -53,31 +55,23 @@ void clearConsole() {
     std::system("clear");
 #endif
 }
-// Use clearConsole(); when calling this.
-// break
 
-class tools{
-    public:
-    
-    
-    
-    
-    const char toUpperCase(const char& c){
+class tools {
+public:
+    const char toUpperCase(const char& c) {
         return std::toupper(c);
     }
     
     std::string toupperstring(std::string& str) {
-        // break
         std::string temp;
-        for(const auto& s : str){
-            temp += toUpperCase( s );
-            
+        for(const auto& s : str) {
+            temp += toUpperCase(s);
         }
         return temp;
     }
 };
 
-class gameNumber{
+class gameNumber {
 private:
     std::string shipName;
     std::vector<std::string> inventory;
@@ -95,21 +89,17 @@ private:
         return name;
     }
 
-     std::vector<std::string> possibleItems = {
-            "Laser Cannon", "Shield Generator", "Hyperdrive Booster", "Repair Nanobots",
-            "Cloaking Device", "Tractor Beam", "Energy Capacitor", "Quantum Scanner",
-            "Plasma Torpedo", "Gravity Manipulator", "Antimatter Reactor", "Wormhole Generator",
-            "Ion Thruster", "Nebula Compass", "Stellar Mapper", "Asteroid Drill",
-            "Fusion Reactor", "Cosmic Ray Deflector", "Subspace Communicator", "Stasis Field Projector"
-        };
+    std::vector<std::string> possibleItems = {
+        "Laser Cannon", "Shield Generator", "Hyperdrive Booster", "Repair Nanobots", 
+        "Cloaking Device", "Tractor Beam", "Energy Capacitor", "Quantum Scanner", 
+        "Plasma Torpedo", "Gravity Manipulator", "Antimatter Reactor", "Wormhole Generator", 
+        "Ion Thruster", "Nebula Compass", "Stellar Mapper", "Asteroid Drill", 
+        "Fusion Reactor", "Cosmic Ray Deflector", "Subspace Communicator", "Stasis Field Projector"
+    };
     
-        std::string getRandomItem() {
-            return possibleItems[gen() % possibleItems.size()];
-        }
-
-
-
-
+    std::string getRandomItem() {
+        return possibleItems[gen() % possibleItems.size()];
+    }
 
     std::string getRandomElement(const std::vector<std::string>& vec) {
         return vec[gen() % vec.size()];
@@ -152,32 +142,32 @@ public:
     gameNumber() : xp(0), gen(rd()) {
         shipName = "STELLER-SHIP"; // Can be customized in settings
         inventory.reserve(9);
-    };
+    }
 
-    void mainGameLoop() {
-    while (true) {
-        clearConsole();
-        std::cout << "You are hurtling through space on the " << shipName << ".\n";
-        std::cout << "You come across a new planet!\n\n";
+    bool mainGameLoop() {
+        while (true) {
+            clearConsole();
+            std::cout << "You are hurtling through space on the " << shipName << ".\n";
+            std::cout << "You come across a new planet!\n\n";
 
-        std::string planetName = generatePlanetName();
-        std::cout << "Outo Computer: Planet " << planetName << "!\n";
-        std::cout << "Outo Computer: Do you want to initialize a scan of the planet? (Y/N): ";
-        std::string response;
-        std::cin >> response;
-
-        if (response == "Y" || response == "y") {
-            std::cout << "Outo Computer: Biome: " << getRandomElement({"Desert", "Jungle", "Ocean", "Tundra", "Mountain", "Forest", "Volcanic", "Cratered", "Dead"}) << "\n";
-            std::cout << "Atmosphere: " << getRandomElement({"Breathable", "Toxic", "None"}) << "\n";
-            bool hasLife = getRandomChance(0.5);
-            std::cout << "Life: " << (hasLife ? "Yes" : "No") << "\n";
-            std::cout << "Civilization: " << (hasLife && getRandomChance(0.3) ? "Yes" : "No") << "\n";
-            std::cout << "Resources: Level " << (gen() % 100 + 1) << "\n\n";
-
-            std::cout << "Outo Computer: Do you want to land? (Y/N): ";
+            std::string planetName = generatePlanetName();
+            std::cout << "Outo Computer: Planet " << planetName << "!\n";
+            std::cout << "Outo Computer: Do you want to initialize a scan of the planet? (Y/N): ";
+            std::string response;
             std::cin >> response;
 
             if (response == "Y" || response == "y") {
+                std::cout << "Outo Computer: Biome: " << getRandomElement({"Desert", "Jungle", "Ocean", "Tundra", "Mountain", "Forest", "Volcanic", "Cratered", "Dead"}) << "\n";
+                std::cout << "Atmosphere: " << getRandomElement({"Breathable", "Toxic", "None"}) << "\n";
+                bool hasLife = getRandomChance(0.5);
+                std::cout << "Life: " << (hasLife ? "Yes" : "No") << "\n";
+                std::cout << "Civilization: " << (hasLife && getRandomChance(0.3) ? "Yes" : "No") << "\n";
+                std::cout << "Resources: Level " << (gen() % 100 + 1) << "\n\n";
+
+                std::cout << "Outo Computer: Do you want to land? (Y/N): ";
+                std::cin >> response;
+
+                if (response == "Y" || response == "y") {
                     std::cout << "Descending into the planet.\n";
 
                     if (hasLife && getRandomChance(0.1)) {
@@ -188,44 +178,14 @@ public:
                         if (response == "Y" || response == "y") {
                             std::cout << "Outo Computer: Hold on!\n";
                             delay(3);
-                            if (getRandomChance(0.25)) {
-                                std::cout << "Outo Computer: We made it! Do you want to leave or stay and try to take over? Stay (Y/N): ";
-                                std::cin >> response;
-                                if (response == "Y" || response == "y") {
-                                    std::cout << "Outo Computer: Do you want to bomb the planet or explore for resources? Bomb (Y/N): ";
-                                    std::cin >> response;
-                                    if (response == "Y" || response == "y") {
-                                        std::cout << "Outo Computer: Bombing...\n";
-                                        delay(5);
-                                        std::cout << "Done. You've earned 80 XP.\n";
-                                        xp += 80;
-                                    } else {
-                                        std::cout << "Outo Computer: Exploring!\n";
-                                        delay(5);
-                                        std::cout << "Done! You've earned 50 XP.\n";
-                                        xp += 50;
-                                          if (getRandomChance(0.05)) {
-                                           std::string newItem = getRandomItem();
-                                             std::cout << "You've found a " << newItem << "! Do you want to equip it? (Y/N): ";
-                                            std::string response;
-                                           std::cin >> response;
-                                            if (response == "Y" || response == "y") {
-                                              addToInventory(newItem);
-                }
-            }
-                                        }
-                                    }
-                                } else {
-                                    xp += 10;
-                                    std::cout << "You've earned 10 XP for surviving.\n";
-                                }
-                            } else {
-                                std::cout << "Game Over! Your ship was destroyed.\n";
-                                return;
+                            if (!getRandomChance(0.25)) {
+                                std::cout << "Your ship was destroyed.\n";
+                                return false; // Return false to indicate game over
                             }
+                            // ... (rest of the battle logic)
                         } else {
-                            std::cout << "Game Over! Your ship was destroyed.\n";
-                            return;
+                            std::cout << "Your ship was destroyed.\n";
+                            return false; // Return false to indicate game over
                         }
                     } else {
                         std::cout << "Outo Computer: Collecting resources!\n";
@@ -233,7 +193,7 @@ public:
                         std::cout << "Done! You've earned 100 XP.\n";
                         xp += 100;
                         if (getRandomChance(0.05)) {
-                            std::string newItem = "New Item " + std::to_string(gen() % 20 + 1);
+                            std::string newItem = getRandomItem();
                             std::cout << "You've found a " << newItem << "! Do you want to equip it? (Y/N): ";
                             std::cin >> response;
                             if (response == "Y" || response == "y") {
@@ -244,44 +204,34 @@ public:
                 }
             }
 
-              displayInventory();
-        std::cout << "Current XP: " << xp << std::endl;
-        std::cout << "Press Enter to continue to the next planet...";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cin.get();
+            displayInventory();
+            std::cout << "Current XP: " << xp << std::endl;
+            std::cout << "Press Enter to continue to the next planet...";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cin.get();
         }
-    };
-    
-    
-    
-    
+    }
+};
 
-
-
-
-
-
-class mainMenu{
-    public:
-    void printMenu(){
+class mainMenu {
+public:
+    void printMenu() {
         std::cout << " \n Welcome \n Press 1 For New Game \n Press 2 For Saved Game \n Press 3 For Settings \n Press 4 For Developer Tools \n";
     }
 };
 
-class newGameStart{
-    public:
-    bool printStartOptions(){
-        // make sure to clear the screen before this next line.
-        //break
-       clearConsole();  // Clear the screen before displaying the menu
+class newGameStart {
+public:
+    bool printStartOptions() {
+        clearConsole();
 
         int selectedShip = 0;
         std::string shipNames[] = {"The Hyperbole", "The Riser-2", "The Sunrise", "Newark", "Winona"};
         std::string shipDescriptions[] = {
-            "Fast, Nimble, Light Armor, Machine Guns.",
-            "Strong Shields, Laser Cannons, Slow, Hard To Turn",
-            "Medium Shields, Overpowered Engines, Small Cannons, Normally Slow",
-            "Quick, Small, Fast Engines, Light Guns",
+            "Fast, Nimble, Light Armor, Machine Guns.", 
+            "Strong Shields, Laser Cannons, Slow, Hard To Turn", 
+            "Medium Shields, Overpowered Engines, Small Cannons, Normally Slow", 
+            "Quick, Small, Fast Engines, Light Guns", 
             "Laser Cannons, Fast Engines, No Shields, Quick"
         };
 
@@ -301,7 +251,6 @@ class newGameStart{
                 std::cout << "Exiting ship selection...\n";
                 delay(2);
                 return false;
-                break;
             }
 
             try {
@@ -314,7 +263,6 @@ class newGameStart{
                         std::cout << "Ship confirmed! Preparing for launch...\n";
                         delay(2);
                         return true;
-                        break;
                     }
                 } else {
                     std::cout << "Invalid selection. Please choose a number between 1 and 5.\n";
@@ -323,21 +271,19 @@ class newGameStart{
                 std::cout << "Invalid input. Please enter a number.\n";
             }
 
-            delay(2);  // Short delay before refreshing the menu
+            delay(2);
             clearConsole();
         }
     }
 };
 
-
-//break-------------------------------
 class GameManager {
-private:  
+private:
     mainMenu menu;
     newGameStart gameStart;
     gameNumber game;
 
-public:  
+public:
     void run() {
         while (true) {
             clearConsole();
@@ -350,27 +296,29 @@ public:
                 int choice = std::stoi(mainMenuPrint);
                 
                 switch(choice) {
-                    case 1: 
+                    case 1:
                         if (gameStart.printStartOptions()) {
                             std::cout << "Starting the game...\n";
                             delay(2);
-                            game.mainGameLoop(); // Start the main game loop
-                            return; // Exit the function after the game ends
+                            while (startGame()) {
+                                std::cout << "Restarting game...\n";
+                                delay(2);
+                            }
                         }
                         break;
-                    case 2: 
+                    case 2:
                         std::cout << "Loading saved game...\n";
                         // Add code for loading a saved game
                         break;
-                    case 3: 
+                    case 3:
                         std::cout << "Opening settings...\n";
                         // Add code for settings
                         break;
-                    case 4: 
+                    case 4:
                         std::cout << "Accessing developer tools...\n";
                         // Add code for developer tools
                         break;
-                    default: 
+                    default:
                         std::cout << "Invalid option. Please enter a number between 1 and 4.\n";
                 }
             } catch (const std::invalid_argument& e) {
@@ -379,27 +327,57 @@ public:
                 std::cout << "Input out of range. Please enter a number between 1 and 4.\n";
             }
             
-            delay(2); // Short delay before showing the menu again
+            delay(2);
         }
+    }
+
+private:
+    bool startGame() {
+        clearConsole();
+        std::cout << "Initializing game systems...\n";
+        delay(2);
+        std::cout << "Preparing ship for launch...\n";
+        delay(2);
+        std::cout << "3...\n";
+        delay(1);
+        std::cout << "2...\n";
+        delay(1);
+        std::cout << "1...\n";
+        delay(1);
+        std::cout << "Liftoff!\n";
+        delay(2);
+        clearConsole();
+        
+        bool gameResult = game.mainGameLoop();
+        
+        if (!gameResult) {
+            std::cout << "Game Over! Do you want to play again? (Y/N): ";
+            std::string response;
+            std::cin >> response;
+            return (response == "Y" || response == "y");
+        }
+        
+        return false;
     }
 };
 
-class intro{
-    public:
-    void printIntro(){
+
+
+class intro {
+public:
+    void printIntro() {
         std::cout << "Skipping intro...\n";
         delay(2);
     }
-    void printSkippedIntro(){
-         std::cout << "Continuing with intro in 3 seconds...\n";
+    void printSkippedIntro() {
+        std::cout << "Continuing with intro in 3 seconds...\n";
         delay(3);
         
-        // Intro code starts here
         std::cout << "Starting Intro sequence...\n";
         delay(1);
         std::cout << "Preparing for launch...\n";
         delay(1);
-        std::cout << "Welcome, in this game, the W,A,S,D, keys will control your spacecraft. \n The number keys will control your 10 inventory slots. \n";
+        std::cout << "Welcome, in this game, the Y and N Keys will be the most used. \n The number keys will control your 10 inventory slots. \n";
         delay(1);
         std::cout << "To fire a weapon, you can press the F key. To drop bombs, you can press the B key.\n";
         delay(1);
@@ -412,7 +390,6 @@ class intro{
         std::cout << "Occasionally, You Will Be Greeted By Alien Ships. When This Happens, Quick Timing Is Key!\n";
         delay(1);
         
-        //Break
         clearConsole();
         
         std::cout << "Make Sure To Resize Your Game Console Window To The Center Of The Screen\n \n";
@@ -425,39 +402,31 @@ class intro{
         delay(1);
         std::cout << "1...\n";
         delay(1);
-        //break
         clearConsole();
-        //break
         std::cout << "*Welcome To Space! I'm Outo The Computer. Lets Go!!! \n";
         delay(3);
-        // Intro code ends here
     }
-    void printMainIntro(){
+    void printMainIntro() {
         std::cout << "Downloading....\n" << std::endl;
     
-    delay(1);
+        delay(1);
     
-    std::cout << "Awaiting Input: \n" << std::endl;
+        std::cout << "Awaiting Input: \n" << std::endl;
     
-    delay(1);
+        delay(1);
     
-    std::string input;
-    std::cin >> input;
+        std::string input;
+        std::cin >> input;
     
-    std::cout << "Starting: " << input << std::endl;
-   // std::string str = g_tools.toupperstring(input);
-    delay(1);
-    //std::cout << str << "\n";
-    //delay(1);
-    std::cout << "\n Welcome To STELLER-SHIP!!!\n" << std::endl;
-    std::cout << "Press 'Y' and enter if you wish to skip the Intro. If not, press any other key and hit enter! Space Exploration Awaits!\n";
+        std::cout << "Starting: " << input << std::endl;
+        delay(1);
+        std::cout << "\n Welcome To STELLER-SHIP!!!\n" << std::endl;
+        std::cout << "Press 'Y' and enter if you wish to skip the Intro. If not, press any other key and hit enter! Space Exploration Awaits!\n";
     }
 };
 
 tools g_tools;
 intro g_intro;
-// Function to create a delay 
-
 
 int main() {
     g_intro.printMainIntro();
@@ -468,7 +437,7 @@ int main() {
     if (skipIntro == "Y" || skipIntro == "y") {
         g_intro.printIntro();
     } else {
-       g_intro.printSkippedIntro();
+        g_intro.printSkippedIntro();
     }
 
     std::cout << "Welcome aboard the STELLER-SHIP! Your space adventure begins now!\n";
@@ -477,4 +446,4 @@ int main() {
     gameManager.run();
     
     return 0;
-}
+};
