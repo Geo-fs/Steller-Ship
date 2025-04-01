@@ -1,13 +1,14 @@
-//Copyright 2025 CS Enterprises
+// v1.10
 
-// Local Version v1.02 MAIN Version v1.07
 
 #include <iostream>
 #include <string>
 #include <chrono>
+#include <map> 
 #include <thread>
 #include <cctype>
 #include <vector>
+#include <utility> 
 #include <random>
 #ifdef _WIN32
 #include <windows.h>
@@ -15,6 +16,8 @@
 #include <cstdlib>
 #endif
 
+class gameNumber;
+static void(*print_intro)() = nullptr;
 void delay(int seconds) {
     std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
@@ -71,13 +74,85 @@ public:
     }
 };
 
-class gameNumber {
+//type
+//break
+
+class PlanetElement {
+public:
+    PlanetElement(const std::string& name, const std::vector<std::pair<std::string, int>>& options)
+        : name(name), options(options) {}
+
+    std::string getName() const { return name; }
+    const std::vector<std::pair<std::string, int>>& getOptions() const { return options; }
+
 private:
+    std::string name;
+    std::vector<std::pair<std::string, int>> options;
+};
+
+class PlanetElements {
+public:
+    PlanetElements() {
+        elements.emplace_back("Biome", std::vector<std::pair<std::string, int>>{
+            {"Desert", 1},
+            {"Jungle", 2},
+            {"Ocean", 3},
+            {"Tundra", 4},
+            {"Mountain", 5},
+            {"Forest", 6},
+            {"Volcanic", 7},
+            {"Cratered", 8},
+            {"Dead", 9}
+        });
+        elements.emplace_back("Atmosphere", std::vector<std::pair<std::string, int>>{
+            {"Breathable", 1},
+            {"Toxic", 2},
+            {"None", 3}
+        });
+        elements.emplace_back("Life", std::vector<std::pair<std::string, int>>{
+            {"Yes", 1},
+            {"No", 2}
+        });
+        elements.emplace_back("Civilization", std::vector<std::pair<std::string, int>>{
+            {"Yes", 1},
+            {"No", 2}
+        });
+    }
+
+    const PlanetElement& getElement(const std::string& name) const {
+        for (const auto& element : elements) {
+            if (element.getName() == name) {
+                return element;
+            }
+        }
+        throw std::runtime_error("Element not found");
+    }
+
+    int getValueForOption(const std::string& elementName, const std::string& optionName) const {
+        const PlanetElement& element = getElement(elementName);
+        for (const auto& option : element.getOptions()) {
+            if (option.first == optionName) {
+                return option.second;
+            }
+        }
+        throw std::runtime_error("Option not found");
+    }
+
+private:
+    std::vector<PlanetElement> elements;
+};
+
+//break
+
+class gameNumber {
+private: 
     std::string shipName;
     std::vector<std::string> inventory;
     int xp;
     std::random_device rd;
-    std::mt19937 gen;
+    int roundCount;
+    PlanetElements planetElements;
+    std::mt19937 gen{std::random_device{}()};
 
     std::string generatePlanetName() {
         const std::string consonants = "bcdfghjklmnpqrstvwxyz";
@@ -88,21 +163,73 @@ private:
         }
         return name;
     }
+// make this an enum \/\/\/
 
-    std::vector<std::string> possibleItems = {
-        "Laser Cannon", "Shield Generator", "Hyperdrive Booster", "Repair Nanobots", 
-        "Cloaking Device", "Tractor Beam", "Energy Capacitor", "Quantum Scanner", 
-        "Plasma Torpedo", "Gravity Manipulator", "Antimatter Reactor", "Wormhole Generator", 
-        "Ion Thruster", "Nebula Compass", "Stellar Mapper", "Asteroid Drill", 
-        "Fusion Reactor", "Cosmic Ray Deflector", "Subspace Communicator", "Stasis Field Projector"
+
+
+// make this an ENUM!!!! \/\/\/
+    struct Item {
+        std::string name;
+        int itemNumber;
+        std::string itemCodeID;
+        int levelsAvailable;
+        std::string versionUpdated;
+        std::string description;
+        std::string ability;
+        std::string uses;
+        int kickback;
+        double rarity;
     };
-    
-    std::string getRandomItem() {
-        return possibleItems[gen() % possibleItems.size()];
-    }
 
-    std::string getRandomElement(const std::vector<std::string>& vec) {
-        return vec[gen() % vec.size()];
+    std::vector<Item> possibleItems = {
+        {"Laser Cannon", 1, "1.1", 1, "v 1.05", "Fires Blasts Of Energy At Opponents.", "Damage +20", "ALL", 0, 0.20},
+        {"Shield Generator", 2, "1.2", 1, "v 1.05", "Puts Up A Temporary Shield Between You And Your Opponents.", "Shield 5 Seconds", "2", 0, 0.20},
+        {"Hyperdrive Booster", 3, "1.3", 1, "v 1.05", "Enables 25% More Resources For The Next 2 Planets.", "Resources +25 For 2 Planets", "1", 0, 0.20},
+        {"Repair Nanobots", 4, "1.4", 2, "v 1.05", "Fixes Your Ship Fast And Easy!", "Repair +25 For 1 Planet", "1", 0, 0.10},
+        {"Cloaking Device", 5, "1.5", 2, "v 1.05", "Enables You To Hide Your Ship For 5 Planets.", "Life = 0 For 5 Planets", "1", 0, 0.10},
+        {"Tractor Beam", 6, "1.6", 3, "v 1.05", "Does 50 Damage To Your Opponent.", "Damage +50", "1", 0, 0.10},
+        {"Energy Capacitor", 7, "1.7", 1, "v 1.05", "Enables Speed Increase By 25.", "Speed +25 For 1 Planet", "1", 0, 0.10},
+        {"Quantum Scanner", 8, "1.8", 2, "v 1.05", "Enables 50% More Resources For The Next Planet.", "Resources +50 For 1 Planet", "1", 0, 0.10},
+        {"Plasma Torpedo", 9, "1.9", 4, "v 1.05", "Destroys Your Opponent In One Strike.", "Damage +200 For 1 Planet", "1", 30, 0.10},
+        {"Gravity Manipulator", 10, "2", 1, "v 1.05", "Decreases The Chance Of Being Spotted By Aliens By 25% For 2 Planets.", "Life = 0 For 2 Planets", "1", 0, 0.10},
+        {"Antimatter Reactor", 11, "2.1", 2, "v 1.05", "Increases Speed By 50 For 3 Planets. Not Available For Battles.", "Speed +50 For 3 Planets. No Battles", "1", 0, 0.10},
+        {"Wormhole Generator", 12, "2.2", 3, "v 1.05", "Lets You Get Away Quick From A Fight.", "Speed +100 For Battles Only", "1", 0, 0.10},
+        {"Ion Thruster", 13, "2.3", 1, "v 1.05", "Does 20 Damage To Your Opponents.", "Damage +20", "1", 0, 0.10},
+        {"Nebula Compass", 14, "2.4", 3, "v 1.05", "Enables 50% More Resources For The Next 5 Planets.", "Resources +50 For 5 Planets", "1", 0, 0.10},
+        {"Stellar Mapper", 15, "2.5", 4, "v 1.05", "Enables 100% More Resources For The Next Planet.", "Resources +100 For 1 Planet", "1", 0, 0.10},
+        {"Asteroid Drill", 16, "2.6", 4, "v 1.05", "Allows You To Hide From An Alien For 10 Seconds.", "Shield 10 Seconds", "1", 0, 0.10},
+        {"Fusion Reactor", 17, "2.7", 4, "v 1.05", "Increases Speed By 70 For 5 Planets.", "Speed +70 For 5 Planets", "1", 0, 0.10},
+        {"Cosmic Ray Deflector", 18, "2.8", 3, "v 1.05", "Increases Health By 20 For The Next 5 Planets.", "Health +20 For 5 Planets", "1", 0, 0.10},
+        {"Subspace Communicator", 19, "2.9", 4, "v 1.05", "Allows You To Communicate With Other Players.", "COMMS = ON", "ALL", 0, 0.30},
+        {"Stasis Field Projector", 20, "3", 2, "v 1.05", "Increases Health By 10 For The Next 8 Planets.", "Health +10 For 8 Planets", "1", 0, 0.10}
+    };
+
+
+
+
+//MAKE THIS AN ENUM!!!/\/\/\
+    
+std::string getRandomItem() {
+        std::uniform_real_distribution<> dis(0, 1);
+        double randomValue = dis(gen);
+        double cumulativeProbability = 0.0;
+
+        for (const auto& item : possibleItems) {
+            cumulativeProbability += item.rarity;
+            if (randomValue <= cumulativeProbability) {
+                return item.name;
+            }
+        }
+        
+             return possibleItems.back().name;
+    }
+    
+
+    std::pair<std::string, int> getRandomElement(const std::string& elementName) {
+        const PlanetElement& element = planetElements.getElement(elementName);
+        const auto& options = element.getOptions();
+        size_t index = gen() % options.size();
+        return options[index];
     }
 
     bool getRandomChance(double probability) {
@@ -138,85 +265,198 @@ private:
         std::cout << std::endl;
     }
 
-public:
-    gameNumber() : xp(0), gen(rd()) {
+    bool battleSequence() {
+        int alienHealth = 100;
+        int playerHealth = 100;
+        
+        std::cout << "Battle initiated! Your health: " << playerHealth << ", Alien health: " << alienHealth << "\n";
+        
+        while (alienHealth > 0 && playerHealth > 0) {
+            std::cout << "\nChoose your action:\n";
+            std::cout << "1. Attack\n";
+            std::cout << "2. Defend\n";
+            std::cout << "3. Use Item\n";
+            
+            int choice;
+            std::cin >> choice;
+            
+            int damage;
+            switch(choice) {
+                case 1:
+                    damage = gen() % 20 + 10;
+                    alienHealth -= damage;
+                    std::cout << "You dealt " << damage << " damage to the alien!\n";
+                    break;
+                case 2:
+                    std::cout << "You brace for the alien's attack.\n";
+                    break;
+                case 3:
+                    if (!inventory.empty()) {
+                        std::cout << "Choose an item to use:\n";
+                        for (size_t i = 0; i < inventory.size(); ++i) {
+                            std::cout << i+1 << ". " << inventory[i] << "\n";
+                        }
+                        int itemChoice;
+                        std::cin >> itemChoice;
+                        if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
+                            std::cout << "You used " << inventory[itemChoice-1] << "!\n";
+                            if (inventory[itemChoice-1] == "Repair Nanobots") {
+                                int heal = gen() % 30 + 20;
+                                playerHealth = std::min(100, playerHealth + heal);
+                                std::cout << "You healed " << heal << " health!\n";
+                            } else {
+                                damage = gen() % 30 + 20;
+                                alienHealth -= damage;
+                                std::cout << "You dealt " << damage << " damage to the alien!\n";
+                            }
+                            inventory.erase(inventory.begin() + itemChoice - 1);
+                        } else {
+                            std::cout << "Invalid item choice.\n";
+                        }
+                    } else {
+                        std::cout << "You have no items to use!\n";
+                    }
+                    break;
+                default:
+                    std::cout << "Invalid choice. You hesitated and lost your turn!\n";
+            }
+            
+            if (alienHealth <= 0) {
+                std::cout << "You defeated the alien!\n";
+                xp += 200;
+                std::cout << "You gained 200 XP!\n";
+                return true;
+            }
+            
+            // Alien's turn
+            if (choice == 2) {  // Player defended
+                damage = gen() % 10 + 5;
+            } else {
+                damage = gen() % 20 + 10;
+            }
+            playerHealth -= damage;
+            std::cout << "The alien attacks and deals " << damage << " damage to you!\n";
+            
+            std::cout << "Your health: " << playerHealth << ", Alien health: " << alienHealth << "\n";
+        }
+        
+        if (playerHealth <= 0) {
+            std::cout << "You were defeated by the alien.\n";
+            return false;
+        }
+        
+        return true;  // This line should never be reached, but it's here to satisfy the compiler
+    }
+
+public: 
+       gameNumber() : xp(0), gen(rd()), roundCount(0) {
         shipName = "STELLER-SHIP"; // Can be customized in settings
         inventory.reserve(9);
     }
 
-    bool mainGameLoop() {
-        while (true) {
-            clearConsole();
-            std::cout << "You are hurtling through space on the " << shipName << ".\n";
-            std::cout << "You come across a new planet!\n\n";
+   bool mainGameLoop() {
+    for (roundCount = 0; roundCount < 20; roundCount++) {
+        clearConsole();
+        std::cout << "Round " << roundCount + 1 << " of 20\n";
+        std::cout << "You are hurtling through space on the " << shipName << ".\n";
+        std::cout << "You come across a new planet!\n\n";
 
-            std::string planetName = generatePlanetName();
-            std::cout << "Outo Computer: Planet " << planetName << "!\n";
-            std::cout << "Outo Computer: Do you want to initialize a scan of the planet? (Y/N): ";
-            std::string response;
+        std::string planetName = generatePlanetName();
+        std::cout << "Outo Computer: Planet " << planetName << "!\n";
+        std::cout << "Outo Computer: Do you want to initialize a scan of the planet? (Y/N): ";
+        std::string response;
+        std::cin >> response;
+
+        if (response == "Y" || response == "y") {
+            auto [biomeName, biomeValue] = getRandomElement("Biome");
+            std::cout << "Outo Computer: Biome: " << biomeName << " (ID: " << biomeValue << ")\n";
+
+            auto [atmosphereName, atmosphereValue] = getRandomElement("Atmosphere");
+            std::cout << "Atmosphere: " << atmosphereName << " (ID: " << atmosphereValue << ")\n";
+
+            auto [lifeName, lifeValue] = getRandomElement("Life");
+            std::cout << "Life: " << lifeName << "\n";
+
+            bool hasLife = (lifeName == "Yes");
+            if (hasLife) {
+                auto [civilizationName, civilizationValue] = getRandomElement("Civilization");
+                std::cout << "Civilization: " << civilizationName << "\n";
+            } else {
+                std::cout << "Civilization: No\n";
+            }
+
+            std::cout << "Resources: Level " << (gen() % 100 + 1) << "\n\n";
+
+               std::cout << "Outo Computer: Do you want to land? (Y/N): ";
             std::cin >> response;
 
             if (response == "Y" || response == "y") {
-                std::cout << "Outo Computer: Biome: " << getRandomElement({"Desert", "Jungle", "Ocean", "Tundra", "Mountain", "Forest", "Volcanic", "Cratered", "Dead"}) << "\n";
-                std::cout << "Atmosphere: " << getRandomElement({"Breathable", "Toxic", "None"}) << "\n";
-                bool hasLife = getRandomChance(0.5);
-                std::cout << "Life: " << (hasLife ? "Yes" : "No") << "\n";
-                std::cout << "Civilization: " << (hasLife && getRandomChance(0.3) ? "Yes" : "No") << "\n";
-                std::cout << "Resources: Level " << (gen() % 100 + 1) << "\n\n";
+                std::cout << "Descending into the planet.\n";
 
-                std::cout << "Outo Computer: Do you want to land? (Y/N): ";
-                std::cin >> response;
+                if (hasLife && getRandomChance(0.25)) {
+                    std::cout << "Outo Computer: Aliens are ATTACKING!!!! \n\nBATTLE STATIONS!\n";
+                    std::cout << "Outo Computer: Do you want to do evasive maneuvers? (Y/N): ";
+                    std::cin >> response;
 
-                if (response == "Y" || response == "y") {
-                    std::cout << "Descending into the planet.\n";
-
-                    if (hasLife && getRandomChance(0.1)) {
-                        std::cout << "Outo Computer: Aliens are ATTACKING!!!! \n\nBATTLE STATIONS!\n";
-                        std::cout << "Outo Computer: Do you want to do evasive maneuvers? (Y/N): ";
-                        std::cin >> response;
-
-                        if (response == "Y" || response == "y") {
-                            std::cout << "Outo Computer: Hold on!\n";
-                            delay(3);
-                            if (!getRandomChance(0.25)) {
-                                std::cout << "Your ship was destroyed.\n";
-                                return false; // Return false to indicate game over
-                            }
-                            // ... (rest of the battle logic)
+                    if (response == "Y" || response == "y") {
+                        std::cout << "Outo Computer: Hold on!\n";
+                        delay(3);
+                        if (!getRandomChance(0.25)) {
+                            std::cout << "Your ship was damaged but you managed to escape.\n";
+                            xp -= 50; // Penalty for retreating
+                        } else if (!battleSequence()) {
+                            std::cout << "You lost the battle but managed to escape.\n";
+                            xp -= 100; // Bigger penalty for losing
                         } else {
-                            std::cout << "Your ship was destroyed.\n";
-                            return false; // Return false to indicate game over
+                            std::cout << "You won the battle!\n";
+                            xp += 200;
                         }
                     } else {
-                        std::cout << "Outo Computer: Collecting resources!\n";
-                        delay(3);
-                        std::cout << "Done! You've earned 100 XP.\n";
-                        xp += 100;
-                        if (getRandomChance(0.05)) {
-                            std::string newItem = getRandomItem();
-                            std::cout << "You've found a " << newItem << "! Do you want to equip it? (Y/N): ";
-                            std::cin >> response;
-                            if (response == "Y" || response == "y") {
-                                addToInventory(newItem);
-                            }
+                        std::cout << "You decided not to engage and retreated.\n";
+                        xp -= 25; // Small penalty for not engaging
+                    }
+                } else {
+                    std::cout << "Outo Computer: Collecting resources!\n";
+                    delay(3);
+                    std::cout << "Done! You've earned 100 XP.\n";
+                    xp += 100;
+                    if (getRandomChance(0.5)) {
+                        std::string newItem = getRandomItem();
+                        std::cout << "You've found a " << newItem << "! Do you want to equip it? (Y/N): ";
+                        std::cin >> response;
+                        if (response == "Y" || response == "y") {
+                            addToInventory(newItem);
                         }
                     }
                 }
+            } else {
+                std::cout << "You decided not to land on this planet.\n";
             }
-
-            displayInventory();
-            std::cout << "Current XP: " << xp << std::endl;
-            std::cout << "Press Enter to continue to the next planet...";
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cin.get();
+        } else {
+            std::cout << "You decided to skip this planet.\n";
         }
+
+        std::cout << "\n--- End of Round " << roundCount + 1 << " ---\n";
+        displayInventory();
+        std::cout << "Current XP: " << xp << std::endl;
+        std::cout << "Press Enter to continue to the next round...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.get();
     }
+    std::cout << "You've completed 20 rounds! Game over.\n";
+    return true;
+} 
 };
+
+   
+
+
+
 
 class mainMenu {
 public:
     void printMenu() {
-        std::cout << " \n Welcome \n Press 1 For New Game \n Press 2 For Saved Game \n Press 3 For Settings \n Press 4 For Developer Tools \n";
+        std::cout << " \n Welcome \n Press 1 For New Game \n Press 2 For Saved Game \n Press 3 For Settings \n Press 4 For Developer Tools \n Press 5 For The About Page \n";
     }
 };
 
@@ -275,15 +515,20 @@ public:
             clearConsole();
         }
     }
+
 };
 
 class GameManager {
 private:
     mainMenu menu;
     newGameStart gameStart;
-    gameNumber game;
+    gameNumber* game;
 
 public:
+    GameManager():game(nullptr) {} 
+    ~GameManager() { delete game; } 
+
+
     void run() {
         while (true) {
             clearConsole();
@@ -318,8 +563,15 @@ public:
                         std::cout << "Accessing developer tools...\n";
                         // Add code for developer tools
                         break;
+                        
+                    case 5:
+                        std::cout << "About page loading...\n";
+                        //add code for the about page
+                        print_intro();
+                        break;
+                        
                     default:
-                        std::cout << "Invalid option. Please enter a number between 1 and 4.\n";
+                        std::cout << "Invalid option. Please enter a number between 1 and 5.\n";
                 }
             } catch (const std::invalid_argument& e) {
                 std::cout << "Invalid input. Please enter a number.\n";
@@ -333,6 +585,11 @@ public:
 
 private:
     bool startGame() {
+        if(!game) {
+            game = new gameNumber();
+        }
+        
+        
         clearConsole();
         std::cout << "Initializing game systems...\n";
         delay(2);
@@ -348,7 +605,7 @@ private:
         delay(2);
         clearConsole();
         
-        bool gameResult = game.mainGameLoop();
+        bool gameResult = game->mainGameLoop();
         
         if (!gameResult) {
             std::cout << "Game Over! Do you want to play again? (Y/N): ";
@@ -358,7 +615,7 @@ private:
         }
         
         return false;
-    }
+    };
 };
 
 
@@ -369,7 +626,7 @@ public:
         std::cout << "Skipping intro...\n";
         delay(2);
     }
-    void printSkippedIntro() {
+    static void printSkippedIntro() {
         std::cout << "Continuing with intro in 3 seconds...\n";
         delay(3);
         
@@ -429,6 +686,7 @@ tools g_tools;
 intro g_intro;
 
 int main() {
+    print_intro = &intro::printSkippedIntro;
     g_intro.printMainIntro();
     
     std::string skipIntro;
@@ -446,4 +704,7 @@ int main() {
     gameManager.run();
     
     return 0;
-};
+}
+
+
+
