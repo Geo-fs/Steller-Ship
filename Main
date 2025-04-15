@@ -1,80 +1,86 @@
-//main
-// NOTICE: v1.02 Published by CS Enterprises. Developed by CS Game Studios. Developed on jdoodle.
 #include <iostream>
 #include <string>
 #include <chrono>
+#include <map> 
 #include <thread>
+#include <cctype>
+#include <vector>
+#include <utility> 
+#include <random>
+#include "header.h"
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <cstdlib>
+#endif
+#include <unordered_map>
+#include <sstream>
 
-// Function to create a delay 
-void delay(int seconds) {
-    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+//g
+
+
+
+void clearConsole() {
+#ifdef _WIN32
+    // For Windows
+    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    DWORD count;
+    DWORD cellCount;
+    COORD homeCoords = { 0, 0 };
+
+    if (hStdOut == INVALID_HANDLE_VALUE) return;
+
+    if (!GetConsoleScreenBufferInfo(hStdOut, &csbi)) return;
+    cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+
+    if (!FillConsoleOutputCharacter(
+        hStdOut,
+        (TCHAR)' ',
+        cellCount,
+        homeCoords,
+        &count
+    )) return;
+
+    if (!FillConsoleOutputAttribute(
+        hStdOut,
+        csbi.wAttributes,
+        cellCount,
+        homeCoords,
+        &count
+    )) return;
+
+    SetConsoleCursorPosition(hStdOut, homeCoords);
+#else
+    // For Unix-like systems (Linux, macOS)
+    std::system("clear");
+#endif
 }
 
+tools g_tools;
+intro g_intro;
+
 int main() {
-    // The following is the how to play. 
-    std::cout << "Downloading....\n" << std::endl;
-    
-    delay(1);
-    
-    std::cout << "Awaiting Input: \n" << std::endl;
-    
-    delay(1);
-    
-    std::string input;
-    std::cin >> input;
-    
-    std::cout << "Starting: " << input << std::endl;
-    
-    delay(1);
-    
-    std::cout << "\nWelcome To STELLER-SHIP!!!\n" << std::endl;
-    std::cout << "Press 'Y' and enter if you wish to skip the Intro. If not, press any other key and hit enter! Space Exploration Awaits!\n";
+    ///print_intro = &intro::printSkippedIntro;
+    intro::printSkippedIntro();
+    g_intro.printMainIntro();
 
     std::string skipIntro;
     std::cin >> skipIntro;
 
     if (skipIntro == "Y" || skipIntro == "y") {
-        std::cout << "Skipping intro...\n";
-        delay(2);
-    } else {
-        std::cout << "Continuing with intro in 3 seconds...\n";
-        delay(3);
-        
-        // Intro code starts here
-        std::cout << "Starting Intro sequence...\n";
-        delay(1);
-        std::cout << "Preparing for launch...\n";
-        delay(1);
-        std::cout << "Welcome, in this game, the W,A,S,D, keys will control your spacecraft. \n The number keys will control your 10 inventory slots. \n";
-        delay(1);
-        std::cout << "To fire a weapon, you can press the F key. To drop bombs, you can press the B key.\n";
-        delay(1);
-        std::cout << "Get Ready For Liftoff! \n \n";
-        delay(1);
-        std::cout << "You Are A Space Explorer. You Pilot Your Trusty Ships With The Help Of The Outo Computer.\n";
-        std::cout << "You Will Start As A Cadet And Slowly Make Your Way To General In The Space Alliance! \n";
-        delay(1);
-        std::cout << "When You Get To A Planet, Outo Will Ask You What You Want To Do.\n";
-        std::cout << "Occasionally, You Will Be Greeted By Alien Ships. When This Happens, Quick Timing Is Key!\n";
-        delay(1);
-        
-        //Break
-        std::cout << "Make Sure To Resize Your Game Console Window To The Center Of The Screen\n \n";
-        delay(1);
-        std::cout << "I Can't Stay Long.... Good Luck Cadet. \n We All Depend On You. \n Liftoff In: \n";
-        delay(1);
-        std::cout << "3...\n";
-        delay(1);
-        std::cout << "2...\n";
-        delay(1);
-        std::cout << "1...\n";
-        delay(1);
-        std::cout << "*Welcome To Space! I'm Outo The Computer. Lets Go!!! \n";
-        delay(3);
-        // Intro code ends here
+        g_intro.printIntro();
+    }
+    else {
+        g_intro.printSkippedIntro();
     }
 
     std::cout << "Welcome aboard the STELLER-SHIP! Your space adventure begins now!\n";
+
+    GameManager gameManager;
+    gameManager.run();
+
+  
 
     return 0;
 }
