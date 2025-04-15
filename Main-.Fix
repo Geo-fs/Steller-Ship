@@ -1,62 +1,69 @@
-#include <iostream>
-#include <string>
-#include <chrono>
-#include <map> 
-#include <thread>
-#include <cctype>
-#include <vector>
-#include <utility> 
-#include <random>
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <cstdlib>
-#endif
-#include <unordered_map>
-#include <sstream>
 
-//g
-void delay(int seconds) {
+static void delay(int seconds) {
     std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
 
+class intro {
+public:
+    void printIntro() {
+        std::cout << "Skipping intro...\n";
+        delay(2);
+    }
+    static void printSkippedIntro() {
+        std::cout << "Continuing with intro in 3 seconds...\n";
+        delay(3);
 
-void clearConsole() {
-#ifdef _WIN32
-    // For Windows
-    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    DWORD count;
-    DWORD cellCount;
-    COORD homeCoords = { 0, 0 };
+        std::cout << "Starting Intro sequence...\n";
+        delay(1);
+        std::cout << "Preparing for launch...\n";
+        delay(1);
+        std::cout << "Welcome, in this game, the Y and N Keys will be the most used. \n The number keys will control your 10 inventory slots. \n";
+        delay(1);
+        std::cout << "To fire a weapon, you can press the F key. To drop bombs, you can press the B key.\n";
+        delay(1);
+        std::cout << "Get Ready For Liftoff! \n \n";
+        delay(1);
+        std::cout << "You Are A Space Explorer. You Pilot Your Trusty Ships With The Help Of The Outo Computer.\n";
+        std::cout << "You Will Start As A Cadet And Slowly Make Your Way To General In The Space Alliance! \n";
+        delay(1);
+        std::cout << "When You Get To A Planet, Outo Will Ask You What You Want To Do.\n";
+        std::cout << "Occasionally, You Will Be Greeted By Alien Ships. When This Happens, Quick Timing Is Key!\n";
+        delay(8);
 
-    if (hStdOut == INVALID_HANDLE_VALUE) return;
+        clearConsole();
 
-    if (!GetConsoleScreenBufferInfo(hStdOut, &csbi)) return;
-    cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+        std::cout << "Make Sure To Resize Your Game Console Window To The Center Of The Screen\n \n";
+        delay(1);
+        std::cout << "I Can't Stay Long.... Good Luck Cadet. \n We All Depend On You. \n Liftoff In: \n";
+        delay(1);
+        std::cout << "3...\n";
+        delay(1);
+        std::cout << "2...\n";
+        delay(1);
+        std::cout << "1...\n";
+        delay(3);
+        clearConsole();
+        std::cout << "*Welcome To Space! I'm Outo The Computer. Lets Go!!! \n";
+        delay(3);
+    }
+    void printMainIntro() {
+        std::cout << "Downloading....\n" << std::endl;
 
-    if (!FillConsoleOutputCharacter(
-        hStdOut,
-        (TCHAR)' ',
-        cellCount,
-        homeCoords,
-        &count
-    )) return;
+        delay(1);
 
-    if (!FillConsoleOutputAttribute(
-        hStdOut,
-        csbi.wAttributes,
-        cellCount,
-        homeCoords,
-        &count
-    )) return;
+        std::cout << "Awaiting Input: \n" << std::endl;
 
-    SetConsoleCursorPosition(hStdOut, homeCoords);
-#else
-    // For Unix-like systems (Linux, macOS)
-    std::system("clear");
-#endif
-}
+        delay(1);
+
+        std::string input;
+        std::cin >> input;
+
+        std::cout << "Starting: " << input << std::endl;
+        delay(1);
+        std::cout << "\n Welcome To STELLER-SHIP!!!\n" << std::endl;
+        std::cout << "Press 'Y' and enter if you wish to skip the Intro. If not, press any other key and hit enter! Space Exploration Awaits!\n";
+    }
+};
 
 class tools {
 public:
@@ -229,7 +236,7 @@ private:
     };
 
     ItemType getItemType(const int& i) {
-        for (const auto& eiou : itemInfoMap) {
+        for (auto& eiou : itemInfoMap) {
             if (i == eiou.second.itemnumber)
                 return eiou.first;
         }
@@ -337,7 +344,7 @@ private:
 
     void useInventoryItem(int index) {
         if (index >= 0 && index < inventory.size()) {
-            ItemType item = inventory[index];
+            ItemType item = getItemType(inventory[index].itemnumber);
             useItem(item);
             inventory.erase(inventory.begin() + index);
         }
@@ -350,7 +357,7 @@ private:
     void displayInventory() {
         std::cout << "INVENTORY: ";
         for (const auto& item : inventory) {
-            std::cout << "[" << item << "] ";
+            std::cout << "[" << item.name << "] ";
         }
         std::cout << std::endl;
     }
@@ -384,13 +391,13 @@ private:
                 if (!inventory.empty()) {
                     std::cout << "Choose an item to use:\n";
                     for (size_t i = 0; i < inventory.size(); ++i) {
-                        std::cout << i + 1 << ". " << inventory[i] << "\n";
+                        std::cout << i + 1 << ". " << inventory[i].name << "\n";
                     }
                     int itemChoice;
                     std::cin >> itemChoice;
                     if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
-                        std::cout << "You used " << inventory[itemChoice - 1] << "!\n";
-                        if (inventory[itemChoice - 1] == "Repair Nanobots") {
+                        std::cout << "You used " << inventory[itemChoice - 1].name << "!\n";
+                        if (inventory[itemChoice - 1].name == "Repair Nanobots") {
                             int heal = gen() % 30 + 20;
                             playerHealth = std::min(100, playerHealth + heal);
                             std::cout << "You healed " << heal << " health!\n";
@@ -448,7 +455,7 @@ public:
         inventory.reserve(9);
     }
 
-    bool mainGameLoop() {
+    bool mainGameLoop(gameNumber* ge) {
         for (roundCount = 0; roundCount < 20; roundCount++) {
             clearConsole();
             std::cout << "Round " << roundCount + 1 << " of 20\n";
@@ -525,7 +532,7 @@ public:
                             std::cout << "You've found a " << info.name << "! Do you want to equip it? (Y/N): ";
                             std::cin >> response;
                             if (response == "Y" || response == "y") {
-                                addToInventory(info);
+                                ge->addItemToInventory(info);
                             }
                         }
                     }
@@ -676,7 +683,7 @@ public:
                 case 5:
                     std::cout << "About page loading...\n";
                     //add code for the about page
-                    print_intro();
+                    intro::printSkippedIntro();
                     break;
 
                 default:
@@ -716,7 +723,7 @@ private:
         delay(2);
         clearConsole();
 
-        bool gameResult = game->mainGameLoop();
+        bool gameResult = game->mainGameLoop(game);
 
         if (!gameResult) {
             std::cout << "Game Over! Do you want to play again? (Y/N): ";
@@ -728,95 +735,5 @@ private:
         return false;
     };
 };
-
-
-
-class intro {
-public:
-    void printIntro() {
-        std::cout << "Skipping intro...\n";
-        delay(2);
-    }
-    static void printSkippedIntro() {
-        std::cout << "Continuing with intro in 3 seconds...\n";
-        delay(3);
-
-        std::cout << "Starting Intro sequence...\n";
-        delay(1);
-        std::cout << "Preparing for launch...\n";
-        delay(1);
-        std::cout << "Welcome, in this game, the Y and N Keys will be the most used. \n The number keys will control your 10 inventory slots. \n";
-        delay(1);
-        std::cout << "To fire a weapon, you can press the F key. To drop bombs, you can press the B key.\n";
-        delay(1);
-        std::cout << "Get Ready For Liftoff! \n \n";
-        delay(1);
-        std::cout << "You Are A Space Explorer. You Pilot Your Trusty Ships With The Help Of The Outo Computer.\n";
-        std::cout << "You Will Start As A Cadet And Slowly Make Your Way To General In The Space Alliance! \n";
-        delay(1);
-        std::cout << "When You Get To A Planet, Outo Will Ask You What You Want To Do.\n";
-        std::cout << "Occasionally, You Will Be Greeted By Alien Ships. When This Happens, Quick Timing Is Key!\n";
-        delay(8);
-
-        clearConsole();
-
-        std::cout << "Make Sure To Resize Your Game Console Window To The Center Of The Screen\n \n";
-        delay(1);
-        std::cout << "I Can't Stay Long.... Good Luck Cadet. \n We All Depend On You. \n Liftoff In: \n";
-        delay(1);
-        std::cout << "3...\n";
-        delay(1);
-        std::cout << "2...\n";
-        delay(1);
-        std::cout << "1...\n";
-        delay(3);
-        clearConsole();
-        std::cout << "*Welcome To Space! I'm Outo The Computer. Lets Go!!! \n";
-        delay(3);
-    }
-    void printMainIntro() {
-        std::cout << "Downloading....\n" << std::endl;
-
-        delay(1);
-
-        std::cout << "Awaiting Input: \n" << std::endl;
-
-        delay(1);
-
-        std::string input;
-        std::cin >> input;
-
-        std::cout << "Starting: " << input << std::endl;
-        delay(1);
-        std::cout << "\n Welcome To STELLER-SHIP!!!\n" << std::endl;
-        std::cout << "Press 'Y' and enter if you wish to skip the Intro. If not, press any other key and hit enter! Space Exploration Awaits!\n";
-    }
-};
-
-tools g_tools;
-intro g_intro;
-
-int main() {
-    print_intro = &intro::printSkippedIntro;
-    g_intro.printMainIntro();
-
-    std::string skipIntro;
-    std::cin >> skipIntro;
-
-    if (skipIntro == "Y" || skipIntro == "y") {
-        g_intro.printIntro();
-    }
-    else {
-        g_intro.printSkippedIntro();
-    }
-
-    std::cout << "Welcome aboard the STELLER-SHIP! Your space adventure begins now!\n";
-
-    GameManager gameManager;
-    gameManager.run();
-
-    return 0;
-}
-
 
 
