@@ -1,0 +1,18 @@
+// .h
+#include <string>
+#include "GameLogger.h"
+class tools {
+public:
+    const char toUpperCase(const char& c) {
+        return std::toupper(c);
+    }
+
+    std::string toupperstring(std::string& str) {
+        std::string temp;
+        for (const auto& s : str) {
+            temp += toUpperCase(s);
+        }
+        return temp;
+    }
+};
+
