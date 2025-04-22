@@ -1,0 +1,90 @@
+
+#include <iostream>
+#include <string>
+#include <chrono>
+#include <map> 
+#include <thread>
+#include <cctype>
+#include <vector>
+#include <utility> 
+#include <random>
+#include "header.h"
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include "GameLogger.h"
+#include <cstdlib>
+#endif
+#include <unordered_map>
+#include <sstream>
+
+//g
+
+
+
+void clearConsole() {
+#ifdef _WIN32
+    // For Windows
+    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    DWORD count;
+    DWORD cellCount;
+    COORD homeCoords = { 0, 0 };
+
+    if (hStdOut == INVALID_HANDLE_VALUE) return;
+
+    if (!GetConsoleScreenBufferInfo(hStdOut, &csbi)) return;
+    cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+
+    if (!FillConsoleOutputCharacter(
+        hStdOut,
+        (TCHAR)' ',
+        cellCount,
+        homeCoords,
+        &count
+    )) return;
+
+    if (!FillConsoleOutputAttribute(
+        hStdOut,
+        csbi.wAttributes,
+        cellCount,
+        homeCoords,
+        &count
+    )) return;
+
+    SetConsoleCursorPosition(hStdOut, homeCoords);
+#else
+    // For Unix-like systems (Linux, macOS)
+    std::system("clear");
+#endif
+}
+
+tools g_tools;
+intro g_intro;
+
+int main() {
+    ///print_intro = &intro::printSkippedIntro;
+    GameLogger logger("stellar_ship_log.txt");
+    logger.logAction("Game started");
+    intro::printSkippedIntro();
+    g_intro.printMainIntro();
+
+    std::string skipIntro;
+    std::cin >> skipIntro;
+
+    if (skipIntro == "Y" || skipIntro == "y") {
+        g_intro.printIntro();
+    }
+    else {
+        g_intro.printSkippedIntro();
+    }
+
+    std::cout << "Welcome aboard the STELLER-SHIP! Your space adventure begins now!\n";
+
+    GameManager gameManager;
+    gameManager.run();
+
+
+
+    return 0;
+}
