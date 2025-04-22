@@ -1,3 +1,4 @@
+#pragma once
 // GameLogger.h
 
 #ifndef GAME_LOGGER_H
@@ -41,7 +42,7 @@ public:
         }
     }
 
-    // Add a variable name to be tracked
+    // Add a variable name to be tracked.
     void addVariableName(const std::string& varName) {
         variableNames.push_back(varName);
         logAction("Added variable to track: " + varName);
