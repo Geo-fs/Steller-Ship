@@ -1,0 +1,19 @@
+#pragma once
+#include <iostream>
+#include <string>
+#include "header.h"
+class savedGame
+{
+public:
+	savedGame(){
+		std::cout << "Saved Game Constructor Called. Nice.\n";
+
+	}
+	bool gameSave(const gameNumber& game);
+
+
+	~savedGame() {
+		std::cout << "Saved Game Deconstructor Called. Haha... \n";
+	}
+};
+
