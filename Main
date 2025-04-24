@@ -20,6 +20,20 @@
 #endif
 #include <unordered_map>
 #include <sstream>
+#include "GameSaver.h"
+#include "GameState.h"
+
+GameSaver gameSaver;
+GameState currentState; // Assume this holds the current game state
+
+char input;
+std::cin >> input;
+
+if (input == 's' || input == 'S') {
+    gameSaver.saveGame(currentState);
+    // Code to return to the main menu
+}
+
 
 //placeholder
 
