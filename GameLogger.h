@@ -18,12 +18,11 @@ public:
 
     void log(const std::string& message, LogLevel level = LogLevel::INFO);
 
-    // Delete copy constructor and assignment operator
     GameLogger(const GameLogger&) = delete;
     GameLogger& operator=(const GameLogger&) = delete;
 
 private:
-    GameLogger();  // Private constructor
+    GameLogger();  
     ~GameLogger();
 
     std::ofstream logFile;
