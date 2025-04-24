@@ -1,12 +1,11 @@
 #pragma once
-#pragma once
 #include <string>
 #include <iostream>
 #include <chrono>
 #include "GameLogger.h"
-#include "tools.h"
-
-
+static void delay(int seconds) {
+    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+}
 
 
 class intro {
