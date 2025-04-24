@@ -1,90 +1,36 @@
-#pragma once
-// GameLogger.h
-
-#ifndef GAME_LOGGER_H
-#define GAME_LOGGER_H
+#ifndef GAMELOGGER_H
+#define GAMELOGGER_H
 
 #include <string>
-#include <vector>
 #include <fstream>
-#include <chrono>
-#include <iomanip>
-#include <sstream>
+#include <mutex>
 
-class GameLogger {
-private:
-    std::ofstream logFile;
-    std::vector<std::string> variableNames;
-    std::string logFileName;
-
-    // Helper function to get current timestamp
-    std::string getCurrentTimestamp() {
-        auto now = std::chrono::system_clock::now();
-        auto in_time_t = std::chrono::system_clock::to_time_t(now);
-        std::stringstream ss;
-        ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
-        return ss.str();
-    }
-
-public:
-    GameLogger(const std::string& fileName = "game_log.txt") : logFileName(fileName) {
-        logFile.open(logFileName, std::ios::app);
-        if (!logFile.is_open()) {
-            throw std::runtime_error("Unable to open log file: " + logFileName);
-        }
-        logAction("Game logger initialized");
-    }
-
-    ~GameLogger() {
-        if (logFile.is_open()) {
-            logAction("Game logger shutdown");
-            logFile.close();
-        }
-    }
-
-    // Add a variable name to be tracked.
-    void addVariableName(const std::string& varName) {
-        variableNames.push_back(varName);
-        logAction("Added variable to track: " + varName);
-    }
-
-    // Log an action
-    void logAction(const std::string& action) {
-        logFile << getCurrentTimestamp() << " - ACTION: " << action << std::endl;
-    }
-
-    // Log a variable change
-    template<typename T>
-    void logVariableChange(const std::string& varName, const T& oldValue, const T& newValue) {
-        logFile << getCurrentTimestamp() << " - VARIABLE CHANGE: " << varName
-            << " changed from " << oldValue << " to " << newValue << std::endl;
-    }
-
-    // Log variable status for all tracked variables
-    template<typename T>
-    void logVariableStatus(const std::string& varName, const T& value) {
-        logFile << getCurrentTimestamp() << " - VARIABLE STATUS: " << varName
-            << " = " << value << std::endl;
-    }
-
-    // Log all tracked variables (to be called with actual game variables)
-    template<typename... Args>
-    void logAllVariables(Args... args) {
-        logAction("Logging all tracked variables");
-        logVariablesHelper(0, args...);
-    }
-
-private:
-    // Helper function for logAllVariables
-    template<typename T, typename... Args>
-    void logVariablesHelper(size_t index, T value, Args... args) {
-        if (index < variableNames.size()) {
-            logVariableStatus(variableNames[index], value);
-        }
-        if constexpr (sizeof...(args) > 0) {
-            logVariablesHelper(index + 1, args...);
-        }
-    }
+enum class LogLevel {
+    INFO,
+    WARNING,
+    ERROR,
+    DEBUG
 };
 
-#endif // GAME_LOGGER_H
+class GameLogger {
+public:
+    static GameLogger& getInstance();
+
+    void log(const std::string& message, LogLevel level = LogLevel::INFO);
+
+    // Delete copy constructor and assignment operator
+    GameLogger(const GameLogger&) = delete;
+    GameLogger& operator=(const GameLogger&) = delete;
+
+private:
+    GameLogger();  // Private constructor
+    ~GameLogger();
+
+    std::ofstream logFile;
+    std::mutex logMutex;
+
+    std::string getTimestamp();
+    std::string logLevelToString(LogLevel level);
+};
+
+#endif // GAMELOGGER_H
